@@ -7,7 +7,12 @@
           <h3>{{ product.name }}</h3>
           <p class="price">¥{{ (product.price / 100).toFixed(2) }}</p>
           <p class="description">{{ product.description }}</p>
-          <button @click="buyProduct(product.id)" class="buy-btn">立即购买</button>
+          <div class="quantity-control">
+            <button @click="decreaseQty(product)" :disabled="product.quantity <= 1">-</button>
+            <span>{{ product.quantity || 1 }}</span>
+            <button @click="increaseQty(product)">+</button>
+          </div>
+          <button @click="buyProduct(product)" class="buy-btn" :class="{ disabled: product.name.includes('苹果') }">立即购买</button>
         </div>
       </div>
     </div>
@@ -34,8 +39,18 @@ async function fetchProducts() {
   products.value = data
 }
 
-function buyProduct(id) {
-  router.push(`/checkout/${id}`)
+function buyProduct(product) {
+  router.push({ path: `/checkout/${product.id}`, query: { qty: product.quantity || 1 } })
+}
+
+function increaseQty(product) {
+  if (!product.quantity) product.quantity = 1
+  product.quantity++
+}
+
+function decreaseQty(product) {
+  if (!product.quantity) product.quantity = 2
+  if (product.quantity > 1) product.quantity--
 }
 
 onMounted(fetchProducts)
@@ -79,6 +94,31 @@ h1 {
   color: #666;
   font-size: 0.9em;
 }
+.quantity-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+.quantity-control button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+.quantity-control button:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+.quantity-control span {
+  min-width: 30px;
+  text-align: center;
+  font-weight: bold;
+}
 .buy-btn {
   width: 100%;
   padding: 10px;
@@ -91,5 +131,9 @@ h1 {
 }
 .buy-btn:hover {
   background: #c5303c;
+}
+.buy-btn.disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 </style>

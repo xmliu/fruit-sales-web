@@ -13,6 +13,11 @@
 
       <form @submit.prevent="submitOrder">
         <div class="form-group">
+          <label>地址粘贴栏（从其他平台复制地址到这里自动识别）</label>
+          <textarea v-model="pasteAddress" @input="parseAddress" class="paste-input" placeholder="粘贴收货地址，自动识别姓名、电话、地址"></textarea>
+        </div>
+
+        <div class="form-group">
           <label>姓名</label>
           <input v-model="form.name" type="text" required placeholder="请输入您的姓名" />
         </div>
@@ -68,6 +73,10 @@ const router = useRouter()
 
 const product = ref(null)
 const quantity = ref(1)
+
+if (route.query.qty) {
+  quantity.value = parseInt(route.query.qty) || 1
+}
 const loading = ref(false)
 const showModal = ref(false)
 const lastOrder = ref(null)
@@ -79,6 +88,46 @@ const form = ref({
   address: '',
   note: ''
 })
+const pasteAddress = ref('')
+
+function parseAddress() {
+  const text = pasteAddress.value.trim()
+  if (!text) return
+
+  // 匹配手机号（11位数字，前三位常见号段）
+  const phoneMatch = text.match(/1[3-9]\d{9}/)
+  if (phoneMatch) {
+    form.value.phone = phoneMatch[0]
+  }
+
+  // 匹配收货人姓名（通常是地址开头或名字+电话格式）
+  const lines = text.split(/[\n\r]+/)
+  for (const line of lines) {
+    // 去掉手机号后的内容，取前面的部分作为姓名
+    const phoneIdx = line.search(/1[3-9]\d{9}/)
+    if (phoneIdx > 0) {
+      const name = line.substring(0, phoneIdx).replace(/[^a-zA-Z一-龥]/g, '').trim()
+      if (name && !form.value.name) {
+        form.value.name = name
+      }
+    }
+  }
+
+  // 尝试提取地址（去除姓名和电话后的内容）
+  let address = text
+    .replace(/1[3-9]\d{9}/g, '')
+    .replace(/收货人|收货地址|地址|电话|手机号码|：|:/g, '')
+    .trim()
+  // 去掉开头的姓名
+  const phoneIdx = address.search(/1[3-9]\d{9}/)
+  if (phoneIdx > 0) {
+    address = address.substring(phoneIdx)
+  }
+  address = address.replace(/\s+/g, ' ').trim()
+  if (address && address.length > 5) {
+    form.value.address = address
+  }
+}
 
 const totalPrice = computed(() => product.value ? product.value.price * quantity.value : 0)
 
@@ -201,6 +250,10 @@ onMounted(fetchProduct)
   resize: vertical;
   min-height: 80px;
 }
+.form-group textarea.paste-input {
+  border-color: #4CAF50;
+  background: #f0f8f0;
+}
 .submit-btn {
   width: 100%;
   padding: 12px;
@@ -260,6 +313,7 @@ onMounted(fetchProduct)
 .payment-guide p {
   margin: 5px 0;
   line-height: 1.6;
+  font-size: 13px;
 }
 .close-btn {
   padding: 10px 30px;
