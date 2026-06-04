@@ -46,8 +46,10 @@
           <p class="order-id">订单号：<strong>{{ lastOrder?.id }}</strong></p>
         </div>
         <div class="payment-guide">
-          <p>请用微信扫描上方二维码支付<strong>¥{{ (lastOrder?.total_amount / 100).toFixed(2) }}</strong>元，</p>
-          <p>务必在备注/添加说明中填写订单号<strong>{{ lastOrder?.id }}</strong>，</p>
+          <p>由于微信对个人收款码限制识别</p>
+          <p>建议您长按图片选择【转发给朋友】</p>
+          <p>然后在聊天对话框中长按识别支付<strong>¥{{ (lastOrder?.total_amount / 100).toFixed(2) }}</strong>元，</p>
+          <p>务必在备注中填写订单号<strong>{{ lastOrder?.id }}</strong>，</p>
           <p>支付完成后我们为您发货。</p>
         </div>
         <button @click="showModal = false" class="close-btn">我知道了</button>
