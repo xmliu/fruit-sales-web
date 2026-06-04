@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <h1>水果商城</h1>
     <div class="product-list">
       <div v-for="product in products" :key="product.id" class="product-card">
         <img :src="product.image_url" :alt="product.name" class="product-image" />
