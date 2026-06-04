@@ -119,7 +119,20 @@ async function submitOrder() {
   }
 
   lastOrder.value = data
+  await loadQrCodeUrl()
   showModal.value = true
+}
+
+async function loadQrCodeUrl() {
+  const { data, error } = await supabase
+    .from('config')
+    .select('value')
+    .eq('key', 'qrCodeUrl')
+    .single()
+
+  if (!error && data?.value) {
+    qrCodeUrl.value = data.value
+  }
 }
 
 onMounted(fetchProduct)
