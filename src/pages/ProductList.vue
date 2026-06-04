@@ -12,7 +12,7 @@
             <span>{{ product.quantity || 1 }}</span>
             <button @click="increaseQty(product)">+</button>
           </div>
-          <button @click="buyProduct(product)" class="buy-btn" :class="{ disabled: product.name.includes('苹果') }">立即购买</button>
+          <button @click="buyProduct(product)" class="buy-btn" :class="{ disabled: product.name.includes('苹果') }" :disabled="product.name.includes('苹果')">立即购买</button>
         </div>
       </div>
     </div>
