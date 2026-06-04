@@ -131,7 +131,13 @@ async function loadQrCodeUrl() {
     .single()
 
   if (!error && data?.value) {
-    qrCodeUrl.value = data.value
+    let url = data.value
+    // 签名URL转永久URL
+    const signMatch = url.match(/storage\.supabase\.co\/storage\/v1\/object\/sign\/([^?]+)/)
+    if (signMatch) {
+      url = url.replace('/sign/', '/public/').split('?')[0]
+    }
+    qrCodeUrl.value = url
   }
 }
 
