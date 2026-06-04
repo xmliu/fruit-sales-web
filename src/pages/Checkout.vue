@@ -127,7 +127,7 @@ async function loadQrCodeUrl() {
   const { data, error } = await supabase
     .from('config')
     .select('value')
-    .eq('key', 'qrCodeUrl')
+    .eq('id', 'qr_code_url')
     .single()
 
   if (!error && data?.value) {
